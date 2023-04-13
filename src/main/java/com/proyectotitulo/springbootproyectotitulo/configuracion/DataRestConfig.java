@@ -1,6 +1,7 @@
 package com.proyectotitulo.springbootproyectotitulo.configuracion;
 
 import com.proyectotitulo.springbootproyectotitulo.entity.Libro;
+import com.proyectotitulo.springbootproyectotitulo.entity.Resena;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
@@ -22,8 +23,10 @@ public class DataRestConfig implements RepositoryRestConfigurer {
                 HttpMethod.PUT};
 
         config.exposeIdsFor(Libro.class);
+        config.exposeIdsFor(Resena.class);
 
         disableHttpMethods(Libro.class, config, theUnsupportedActions);
+        disableHttpMethods(Resena.class, config, theUnsupportedActions);
 
         cors.addMapping(config.getBasePath() + "/**")
                 .allowedOrigins(theAllowedOrigins);
