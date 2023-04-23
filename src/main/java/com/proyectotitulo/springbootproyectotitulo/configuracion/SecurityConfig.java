@@ -21,7 +21,9 @@ public class SecurityConfig {
         http.authorizeRequests(configurer ->
                         configurer
                                 .antMatchers("/api/libroes/confidencial/**",
-                                        "api/resenas/confidencial/**"
+                                                        "/api/resenas/confidencial/**",
+                                                        "/api/mensajes/confidencial/**",
+                                                        "/api/admin/confidencial/**"
                                 )
                                 .authenticated())
                 .oauth2ResourceServer()

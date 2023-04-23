@@ -1,7 +1,9 @@
 package com.proyectotitulo.springbootproyectotitulo.services;
 
+import com.proyectotitulo.springbootproyectotitulo.dao.HistorialRepositorio;
 import com.proyectotitulo.springbootproyectotitulo.dao.LibroRepositorio;
 import com.proyectotitulo.springbootproyectotitulo.dao.PrestamoRepositorio;
+import com.proyectotitulo.springbootproyectotitulo.entity.Historial;
 import com.proyectotitulo.springbootproyectotitulo.entity.Libro;
 import com.proyectotitulo.springbootproyectotitulo.entity.Prestamo;
 import com.proyectotitulo.springbootproyectotitulo.modeloRespuestas.PrestamosRespuesta;
@@ -24,9 +26,12 @@ public class LibroService {
 
     private PrestamoRepositorio prestamoRepo;
 
-    public LibroService(LibroRepositorio libroRepo, PrestamoRepositorio prestamoRepo) {
+    private HistorialRepositorio historialRepo;
+
+    public LibroService(LibroRepositorio libroRepo, PrestamoRepositorio prestamoRepo, HistorialRepositorio historialRepo) {
         this.libroRepo = libroRepo;
         this.prestamoRepo = prestamoRepo;
+        this.historialRepo = historialRepo;
     }
 
     public Libro pedirPrestamoLibro (String usuarioEmail, Long libroId) throws Exception {
@@ -124,6 +129,18 @@ public class LibroService {
         libroRepo.save(libro.get());
 
         prestamoRepo.deleteById(validarPrestamo.getId());
+
+        Historial historial = new Historial(
+                usuarioEmail,
+                validarPrestamo.getFechaPrestamo(),
+                LocalDate.now().toString(),
+                libro.get().getTitulo(),
+                libro.get().getAutor(),
+                libro.get().getDescripcion(),
+                libro.get().getImg()
+        );
+
+        historialRepo.save(historial);
 
     }
 
