@@ -52,7 +52,7 @@ public class LibroControlador {
         libroService.retortaLibroPrestamo(usuarioEmail, libroId);
     }
 
-    @RequestMapping(value = "/confidencial/renovar/prestamo")
+    @RequestMapping(value = "/confidencial/renovar/prestamo", method = RequestMethod.PUT)
     public void renovarPrestamo(@RequestHeader(value = "Authorization") String token,
                                 @RequestParam Long libroId) throws Exception {
         String usuarioEmail = JWT.procesandoJWT(token, "\"sub\"");

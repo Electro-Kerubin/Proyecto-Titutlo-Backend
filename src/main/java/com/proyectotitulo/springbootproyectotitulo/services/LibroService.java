@@ -59,6 +59,9 @@ public class LibroService {
                         libro.get().getId()
                 );
 
+        // Crea historial
+
+
         prestamoRepo.save(prestamo);
 
         // Se retorna el objeto Libro actualizado después de realizar el préstamo
