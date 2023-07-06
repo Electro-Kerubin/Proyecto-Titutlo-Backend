@@ -26,13 +26,17 @@ public class Prestamo {
     @Column(name = "libro_id")
     private Long libroId;
 
+    @Column(name = "estado")
+    private String estado;
+
     public Prestamo() {
     }
 
-    public Prestamo(String usuarioEmail, String fechaPrestamo, String fechaRetorno, Long libroId) {
+    public Prestamo(String usuarioEmail, String fechaPrestamo, String fechaRetorno, Long libroId, String estado) {
         this.usuarioEmail = usuarioEmail;
         this.fechaPrestamo = fechaPrestamo;
         this.fechaRetorno = fechaRetorno;
         this.libroId = libroId;
+        this.estado = estado;
     }
 }

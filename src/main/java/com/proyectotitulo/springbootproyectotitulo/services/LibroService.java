@@ -56,7 +56,8 @@ public class LibroService {
                         usuarioEmail,
                         LocalDate.now().toString(),
                         LocalDate.now().plusDays(7).toString(),
-                        libro.get().getId()
+                        libro.get().getId(),
+                        "Espera"
                 );
 
         // Crea historial
@@ -109,7 +110,7 @@ public class LibroService {
 
                 long diasRestantes = time.convert(fechaRetorno.getTime() - fechaHoy.getTime(), TimeUnit.MILLISECONDS);
 
-                prestamosRespuesta.add(new PrestamosRespuesta(libro, (int) diasRestantes));
+                prestamosRespuesta.add(new PrestamosRespuesta(libro, prestamo.get().getEstado(), usuarioEmail, (int) diasRestantes));
             }
         }
 

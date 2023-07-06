@@ -4,12 +4,20 @@ import com.proyectotitulo.springbootproyectotitulo.dao.LibroRepositorio;
 import com.proyectotitulo.springbootproyectotitulo.dao.PrestamoRepositorio;
 import com.proyectotitulo.springbootproyectotitulo.dao.ResenaRepositorio;
 import com.proyectotitulo.springbootproyectotitulo.entity.Libro;
+import com.proyectotitulo.springbootproyectotitulo.entity.Prestamo;
 import com.proyectotitulo.springbootproyectotitulo.modeloPeticiones.AñadirLibro;
+import com.proyectotitulo.springbootproyectotitulo.modeloRespuestas.PrestamosRespuesta;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional
@@ -83,6 +91,64 @@ public class AdminService {
         prestamoRepo.deleteAllByLibroId(libroId);
 
         resenaRepo.deleteAllByLibroId(libroId);
+    }
+
+    public void confirmarPrestamo(Long idPrestamo) throws Exception {
+
+        Optional<Prestamo> prestamo = prestamoRepo.findById(idPrestamo);
+
+        if (!prestamo.isPresent()) {
+            throw new Exception("Prestamo no encontrado");
+        }
+
+        prestamoRepo.confirmarPrestamo(idPrestamo);
+
+    }
+
+    public void cancelarPrestamo(Long idPrestamo) throws Exception {
+
+        Optional<Prestamo> prestamo = prestamoRepo.findById(idPrestamo);
+
+        if (!prestamo.isPresent()) {
+            throw new Exception("Prestamo no encontrado");
+        }
+
+        prestamoRepo.cancelarPrestamo(idPrestamo);
+
+    }
+
+    public List<PrestamosRespuesta> listarPrestamosPorConfirmar() throws Exception {
+
+        List<PrestamosRespuesta> prestamosRespuesta = new ArrayList<>();
+        String estado = "Espera";
+        List<Prestamo> listaPrestamos = prestamoRepo.findAllPrestamosByEstado(estado);
+
+        List<Long> libroIdLista = new ArrayList<>();
+
+        for (Prestamo p: listaPrestamos) {
+            libroIdLista.add(p.getLibroId());
+        }
+
+        List<Libro> libros = libroRepo.findLibrosByLibroId(libroIdLista);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (Libro libro: libros) {
+            Optional<Prestamo> prestamo = listaPrestamos.stream().filter(x -> x.getLibroId() == libro.getId()).findFirst();
+
+            if (prestamo.isPresent()) {
+                Date fechaRetorno = simpleDateFormat.parse(prestamo.get().getFechaRetorno());
+                Date fechaHoy = simpleDateFormat.parse(LocalDate.now().toString());
+
+                TimeUnit time = TimeUnit.DAYS;
+
+                long diasRestantes = time.convert(fechaRetorno.getTime() - fechaHoy.getTime(), TimeUnit.MILLISECONDS);
+
+                prestamosRespuesta.add(new PrestamosRespuesta(libro, prestamo.get().getEstado(), prestamo.get().getUsuarioEmail(), (int) diasRestantes));
+            }
+        }
+
+        return prestamosRespuesta;
     }
 
 }

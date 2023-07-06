@@ -2,9 +2,12 @@ package com.proyectotitulo.springbootproyectotitulo.controlador;
 
 import com.proyectotitulo.springbootproyectotitulo.Utilidad.JWT;
 import com.proyectotitulo.springbootproyectotitulo.modeloPeticiones.AñadirLibro;
+import com.proyectotitulo.springbootproyectotitulo.modeloRespuestas.PrestamosRespuesta;
 import com.proyectotitulo.springbootproyectotitulo.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin("http://localhost:3000")
 @RestController
@@ -65,6 +68,42 @@ public class AdminControlador {
         }
 
         adminService.eliminarLibro(libroId);
+    }
+
+    @RequestMapping(value = "/confidencial/confirmar/prestamo", method = RequestMethod.PUT)
+    public void confirmarPrestamo(@RequestHeader(value = "Authorization") String token,
+                                  @RequestParam Long prestamoId) throws Exception {
+
+        String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
+
+        if (admin == null || !admin.equals("admin")) {
+            throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
+        }
+
+        adminService.confirmarPrestamo(prestamoId);
+    }
+
+    @RequestMapping(value = "/confidencial/cancelar/prestamo", method = RequestMethod.PUT)
+    public void cancelarPrestamo(@RequestHeader(value = "Authorization") String token,
+                                 @RequestParam Long prestamoId) throws Exception {
+        String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
+
+        if (admin == null || !admin.equals("admin")) {
+            throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
+        }
+
+        adminService.cancelarPrestamo(prestamoId);
+    }
+
+    @RequestMapping(value = "/confidencial/listaprestamos/confirmar", method = RequestMethod.GET) //Devuelve todos los prestamos "En Espera"
+    public List<PrestamosRespuesta> listaPrestamosConfirmar(@RequestHeader(value = "Authorization") String token) throws Exception {
+
+        String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
+        if (admin == null || !admin.equals("admin")) {
+            throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
+        }
+
+        return adminService.listarPrestamosPorConfirmar();
     }
 
 }

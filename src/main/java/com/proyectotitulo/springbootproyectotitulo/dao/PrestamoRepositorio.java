@@ -12,7 +12,21 @@ public interface PrestamoRepositorio extends JpaRepository<Prestamo, Long> {
 
     Prestamo findByUsuarioEmailAndLibroId(String usuarioEmail, Long libroId);
 
-    List<Prestamo> findLibrosByUsuarioEmail(String usuarioEmail);
+    @Modifying
+    @Query("select p from Prestamo p where estado = :estado")
+    List<Prestamo> findAllPrestamosByEstado(@Param("estado") String estado);
+
+    @Modifying
+    @Query("update Prestamo set estado = 'Confirmado' where id = :idPrestamo")
+    void confirmarPrestamo(@Param("idPrestamo") Long idPrestamo);
+
+    @Modifying
+    @Query("update Prestamo set estado = 'Cancelado' where id = :idPrestamo")
+    void cancelarPrestamo(@Param("idPrestamo") Long idPrestamo);
+
+    @Modifying
+    @Query("select p from Prestamo p where usuario_email = :usuarioEmail and estado = 'Confirmado'")
+    List<Prestamo> findLibrosByUsuarioEmail(@Param("usuarioEmail") String usuarioEmail);
 
     @Modifying
     @Query("delete from Prestamo where libro_id in :libro_id")
