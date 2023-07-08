@@ -7,6 +7,8 @@ import lombok.Data;
 @Data
 public class PrestamosRespuesta {
 
+    private Long idPrestamo;
+
     private Libro libro;
 
     private String estado;
@@ -15,7 +17,8 @@ public class PrestamosRespuesta {
 
     private int diasAlquilerRestantes;
 
-    public PrestamosRespuesta(Libro libro, String estado, String correoUsuario, int diasAlquilerRestantes) {
+    public PrestamosRespuesta(Long idPrestamo, Libro libro, String estado, String correoUsuario, int diasAlquilerRestantes) {
+        this.idPrestamo = idPrestamo;
         this.libro = libro;
         this.estado = estado;
         this.correoUsuario = correoUsuario;

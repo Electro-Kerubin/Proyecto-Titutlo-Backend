@@ -17,11 +17,15 @@ public interface PrestamoRepositorio extends JpaRepository<Prestamo, Long> {
     List<Prestamo> findAllPrestamosByEstado(@Param("estado") String estado);
 
     @Modifying
+    @Query("select p from Prestamo p where estado = 'Espera' and usuario_email = :correoUsuario")
+    List<Prestamo> findAllPrestamosEsperaByUsuario(@Param("correoUsuario") String correoUsuario);
+
+    @Modifying
     @Query("update Prestamo set estado = 'Confirmado' where id = :idPrestamo")
     void confirmarPrestamo(@Param("idPrestamo") Long idPrestamo);
 
     @Modifying
-    @Query("update Prestamo set estado = 'Cancelado' where id = :idPrestamo")
+    @Query("delete from Prestamo where id = :idPrestamo")
     void cancelarPrestamo(@Param("idPrestamo") Long idPrestamo);
 
     @Modifying
@@ -31,4 +35,5 @@ public interface PrestamoRepositorio extends JpaRepository<Prestamo, Long> {
     @Modifying
     @Query("delete from Prestamo where libro_id in :libro_id")
     void deleteAllByLibroId(@Param("libro_id") Long libroId);
+
 }

@@ -48,8 +48,8 @@ public class LibroService {
         }
 
         // Se actualiza el estado del libro (se resta 1 al contador de copias disponibles) y se guarda en la base de datos
-        libro.get().setCopiasDisponibles(libro.get().getCopiasDisponibles() - 1);
-        libroRepo.save(libro.get());
+        //libro.get().setCopiasDisponibles(libro.get().getCopiasDisponibles() - 1);
+        //libroRepo.save(libro.get());
 
         // Se crea un nuevo objeto Prestamo con los datos del usuario, la fecha actual y la fecha de devolución estimada (7 días después de la fecha actual), y se guarda en la base de datos
         Prestamo prestamo = new Prestamo(
@@ -110,7 +110,7 @@ public class LibroService {
 
                 long diasRestantes = time.convert(fechaRetorno.getTime() - fechaHoy.getTime(), TimeUnit.MILLISECONDS);
 
-                prestamosRespuesta.add(new PrestamosRespuesta(libro, prestamo.get().getEstado(), usuarioEmail, (int) diasRestantes));
+                prestamosRespuesta.add(new PrestamosRespuesta(prestamo.get().getId(), libro, prestamo.get().getEstado(), usuarioEmail, (int) diasRestantes));
             }
         }
 
@@ -147,6 +147,7 @@ public class LibroService {
         historialRepo.save(historial);
 
     }
+
 
     public void renovarPrestamo (String usuarioEmail, Long libroId) throws Exception {
 

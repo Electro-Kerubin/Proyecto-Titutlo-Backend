@@ -101,6 +101,11 @@ public class AdminService {
             throw new Exception("Prestamo no encontrado");
         }
 
+        Optional<Libro> libro = libroRepo.findById(prestamo.get().getLibroId());
+
+        libro.get().setCopiasDisponibles(libro.get().getCopiasDisponibles() - 1);
+        libroRepo.save(libro.get());
+
         prestamoRepo.confirmarPrestamo(idPrestamo);
 
     }
@@ -144,7 +149,40 @@ public class AdminService {
 
                 long diasRestantes = time.convert(fechaRetorno.getTime() - fechaHoy.getTime(), TimeUnit.MILLISECONDS);
 
-                prestamosRespuesta.add(new PrestamosRespuesta(libro, prestamo.get().getEstado(), prestamo.get().getUsuarioEmail(), (int) diasRestantes));
+                prestamosRespuesta.add(new PrestamosRespuesta(prestamo.get().getId(), libro, prestamo.get().getEstado(), prestamo.get().getUsuarioEmail(), (int) diasRestantes));
+            }
+        }
+
+        return prestamosRespuesta;
+    }
+
+    public List<PrestamosRespuesta> listarPrestamosPorCorreoUsuarioPorConfirmar(String correoUsuario) throws Exception {
+
+        List<PrestamosRespuesta> prestamosRespuesta = new ArrayList<>();
+        List<Prestamo> listaPrestamos = prestamoRepo.findAllPrestamosEsperaByUsuario(correoUsuario);
+
+        List<Long> libroIdLista = new ArrayList<>();
+
+        for (Prestamo p: listaPrestamos) {
+            libroIdLista.add(p.getLibroId());
+        }
+
+        List<Libro> libros = libroRepo.findLibrosByLibroId(libroIdLista);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (Libro libro: libros) {
+            Optional<Prestamo> prestamo = listaPrestamos.stream().filter(x -> x.getLibroId() == libro.getId()).findFirst();
+
+            if (prestamo.isPresent()) {
+                Date fechaRetorno = simpleDateFormat.parse(prestamo.get().getFechaRetorno());
+                Date fechaHoy = simpleDateFormat.parse(LocalDate.now().toString());
+
+                TimeUnit time = TimeUnit.DAYS;
+
+                long diasRestantes = time.convert(fechaRetorno.getTime() - fechaHoy.getTime(), TimeUnit.MILLISECONDS);
+
+                prestamosRespuesta.add(new PrestamosRespuesta(prestamo.get().getId(), libro, prestamo.get().getEstado(), prestamo.get().getUsuarioEmail(), (int) diasRestantes));
             }
         }
 

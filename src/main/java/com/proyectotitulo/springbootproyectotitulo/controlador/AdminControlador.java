@@ -106,4 +106,15 @@ public class AdminControlador {
         return adminService.listarPrestamosPorConfirmar();
     }
 
+    @RequestMapping(value = "/confidencial/listaprestamos/usuario", method = RequestMethod.GET)
+    public List<PrestamosRespuesta> listarPrestamosConfirmarPorUsuario(@RequestHeader(value = "Authorization") String token, @RequestParam String correoUsuario) throws Exception {
+
+        String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
+        if (admin == null || !admin.equals("admin")) {
+            throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
+        }
+
+        return adminService.listarPrestamosPorCorreoUsuarioPorConfirmar(correoUsuario);
+    }
+
 }
