@@ -1,8 +1,10 @@
 package com.proyectotitulo.springbootproyectotitulo.services;
 
+import com.proyectotitulo.springbootproyectotitulo.dao.HistorialRepositorio;
 import com.proyectotitulo.springbootproyectotitulo.dao.LibroRepositorio;
 import com.proyectotitulo.springbootproyectotitulo.dao.PrestamoRepositorio;
 import com.proyectotitulo.springbootproyectotitulo.dao.ResenaRepositorio;
+import com.proyectotitulo.springbootproyectotitulo.entity.Historial;
 import com.proyectotitulo.springbootproyectotitulo.entity.Libro;
 import com.proyectotitulo.springbootproyectotitulo.entity.Prestamo;
 import com.proyectotitulo.springbootproyectotitulo.modeloPeticiones.AñadirLibro;
@@ -29,11 +31,14 @@ public class AdminService {
 
     private PrestamoRepositorio prestamoRepo;
 
+    private HistorialRepositorio historialRepo;
+
     @Autowired
-    public AdminService(LibroRepositorio libroRepo, ResenaRepositorio resenaRepo, PrestamoRepositorio prestamoRepo) {
+    public AdminService(LibroRepositorio libroRepo, ResenaRepositorio resenaRepo, PrestamoRepositorio prestamoRepo, HistorialRepositorio historialRepo) {
         this.libroRepo = libroRepo;
         this.resenaRepo = resenaRepo;
         this.prestamoRepo = prestamoRepo;
+        this.historialRepo = historialRepo;
     }
 
     public void anadirNuevoLibro(AñadirLibro añadirLibro) {
@@ -148,7 +153,7 @@ public class AdminService {
 
                 long diasRestantes = time.convert(fechaRetorno.getTime() - fechaHoy.getTime(), TimeUnit.MILLISECONDS);
 
-                prestamosRespuesta.add(new PrestamosRespuesta(prestamo.get().getId(), libro, prestamo.get().getEstado(), prestamo.get().getUsuarioEmail(), (int) diasRestantes));
+                prestamosRespuesta.add(new PrestamosRespuesta(prestamo.get().getId(), libro, prestamo.get().getEstado(), prestamo.get().getUsuarioEmail(), (int) diasRestantes, prestamo.get().getFechaPrestamo(), prestamo.get().getFechaRetorno()));
             }
         }
 
@@ -181,7 +186,7 @@ public class AdminService {
 
                 long diasRestantes = time.convert(fechaRetorno.getTime() - fechaHoy.getTime(), TimeUnit.MILLISECONDS);
 
-                prestamosRespuesta.add(new PrestamosRespuesta(prestamo.get().getId(), libro, prestamo.get().getEstado(), prestamo.get().getUsuarioEmail(), (int) diasRestantes));
+                prestamosRespuesta.add(new PrestamosRespuesta(prestamo.get().getId(), libro, prestamo.get().getEstado(), prestamo.get().getUsuarioEmail(), (int) diasRestantes, prestamo.get().getFechaPrestamo(), prestamo.get().getFechaRetorno()));
             }
         }
 
@@ -207,6 +212,52 @@ public class AdminService {
             renovarPrestamo.setFechaRetorno(LocalDate.now().plusDays(7).toString());
             prestamoRepo.save(renovarPrestamo);
         }
+    }
+
+    public void cancelarRenovacionPrestamo(String usuarioEmail, Long libroId) throws Exception {
+
+        Prestamo renovarPrestamo = prestamoRepo.findByUsuarioEmailAndLibroId(usuarioEmail, libroId);
+
+        if(renovarPrestamo == null) {
+            throw new Exception("Prestamo no existe");
+        }
+
+        renovarPrestamo.setEstado("Confirmado");
+
+        prestamoRepo.save(renovarPrestamo);
+    }
+
+    public void confirmarRetornoPrestamo(String usuarioEmail, Long libroId) throws Exception {
+
+        Optional<Libro> libro = libroRepo.findById(libroId);
+
+        Prestamo validarPrestamo = prestamoRepo.findByUsuarioEmailAndLibroId(usuarioEmail, libroId);
+
+        if(!libro.isPresent() || validarPrestamo == null) {
+
+            throw new Exception("El libro o el prestamo no existe");
+        }
+
+        libro.get().setCopiasDisponibles(libro.get().getCopiasDisponibles() + 1);
+
+        libroRepo.save(libro.get());
+
+        prestamoRepo.deleteById(validarPrestamo.getId());
+
+        Historial historial = new Historial(
+                usuarioEmail,
+                validarPrestamo.getFechaPrestamo(),
+                LocalDate.now().toString(),
+                libro.get().getTitulo(),
+                libro.get().getAutor(),
+                libro.get().getDescripcion(),
+                libro.get().getImg()
+        );
+
+        historialRepo.save(historial);
+
+
+
     }
 
 }

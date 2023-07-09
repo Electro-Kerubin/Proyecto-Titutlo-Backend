@@ -110,7 +110,7 @@ public class LibroService {
 
                 long diasRestantes = time.convert(fechaRetorno.getTime() - fechaHoy.getTime(), TimeUnit.MILLISECONDS);
 
-                prestamosRespuesta.add(new PrestamosRespuesta(prestamo.get().getId(), libro, prestamo.get().getEstado(), usuarioEmail, (int) diasRestantes));
+                prestamosRespuesta.add(new PrestamosRespuesta(prestamo.get().getId(), libro, prestamo.get().getEstado(), usuarioEmail, (int) diasRestantes, prestamo.get().getFechaPrestamo(), prestamo.get().getFechaRetorno()));
             }
         }
 
@@ -128,23 +128,8 @@ public class LibroService {
             throw new Exception("El libro o el prestamo no existe");
         }
 
-        libro.get().setCopiasDisponibles(libro.get().getCopiasDisponibles() + 1);
-
-        libroRepo.save(libro.get());
-
-        prestamoRepo.deleteById(validarPrestamo.getId());
-
-        Historial historial = new Historial(
-                usuarioEmail,
-                validarPrestamo.getFechaPrestamo(),
-                LocalDate.now().toString(),
-                libro.get().getTitulo(),
-                libro.get().getAutor(),
-                libro.get().getDescripcion(),
-                libro.get().getImg()
-        );
-
-        historialRepo.save(historial);
+        validarPrestamo.setEstado("Espera Retorno");
+        prestamoRepo.save(validarPrestamo);
 
     }
 

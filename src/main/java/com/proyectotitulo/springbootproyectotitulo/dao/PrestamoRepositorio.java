@@ -33,7 +33,7 @@ public interface PrestamoRepositorio extends JpaRepository<Prestamo, Long> {
     void cancelarPrestamo(@Param("idPrestamo") Long idPrestamo);
 
     @Modifying
-    @Query("select p from Prestamo p where usuario_email = :usuarioEmail and estado in ('Confirmado', 'Espera Renovacion')")
+    @Query("select p from Prestamo p where usuario_email = :usuarioEmail and estado in ('Confirmado', 'Espera Renovacion', 'Espera Retorno')")
     List<Prestamo> findLibrosByUsuarioEmail(@Param("usuarioEmail") String usuarioEmail);
 
     @Modifying

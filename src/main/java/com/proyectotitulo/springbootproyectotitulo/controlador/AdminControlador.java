@@ -149,7 +149,7 @@ public class AdminControlador {
             throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
         }
 
-        adminService.confirmarRenovacionPrestamo(usuarioCorreo, libroId);
+        adminService.cancelarRenovacionPrestamo(usuarioCorreo, libroId);
     }
 
     @RequestMapping(value = "/confidencial/prestamo/retornar/listar", method = RequestMethod.GET)
@@ -164,13 +164,16 @@ public class AdminControlador {
     }
 
     @RequestMapping(value = "/confidencial/prestamo/retornar/confirmar", method = RequestMethod.PUT)
-    public void retornarPrestamoConfirmar(@RequestHeader(value = "Authorization") String token) throws Exception {
+    public void retornarPrestamoConfirmar(@RequestHeader(value = "Authorization") String token,
+                                          @RequestParam String usuarioEmail,
+                                          @RequestParam Long libroId) throws Exception {
 
-    }
+        String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
+        if (admin == null || !admin.equals("admin")) {
+            throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
+        }
 
-    @RequestMapping(value = "/confidencial/prestamo/retornar/cancelar", method = RequestMethod.PUT)
-    public void retornarPrestamoCancelar(@RequestHeader(value = "Authorization") String token) throws Exception {
-
+        adminService.confirmarRetornoPrestamo(usuarioEmail, libroId);
     }
 
 }
