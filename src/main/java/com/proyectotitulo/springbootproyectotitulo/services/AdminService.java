@@ -122,10 +122,9 @@ public class AdminService {
 
     }
 
-    public List<PrestamosRespuesta> listarPrestamosPorConfirmar() throws Exception {
+    public List<PrestamosRespuesta> listarPrestamosPorEstado(String estado) throws Exception {
 
         List<PrestamosRespuesta> prestamosRespuesta = new ArrayList<>();
-        String estado = "Espera";
         List<Prestamo> listaPrestamos = prestamoRepo.findAllPrestamosByEstado(estado);
 
         List<Long> libroIdLista = new ArrayList<>();
@@ -156,10 +155,10 @@ public class AdminService {
         return prestamosRespuesta;
     }
 
-    public List<PrestamosRespuesta> listarPrestamosPorCorreoUsuarioPorConfirmar(String correoUsuario) throws Exception {
+    public List<PrestamosRespuesta> listarPrestamosPorCorreoUsuarioPorConfirmar(String correoUsuario, String estado) throws Exception {
 
         List<PrestamosRespuesta> prestamosRespuesta = new ArrayList<>();
-        List<Prestamo> listaPrestamos = prestamoRepo.findAllPrestamosEsperaByUsuario(correoUsuario);
+        List<Prestamo> listaPrestamos = prestamoRepo.findAllPrestamosByEstadoByUsuario(correoUsuario, estado);
 
         List<Long> libroIdLista = new ArrayList<>();
 
@@ -187,6 +186,27 @@ public class AdminService {
         }
 
         return prestamosRespuesta;
+    }
+
+    public void confirmarRenovacionPrestamo (String usuarioEmail, Long libroId) throws Exception {
+
+        Prestamo renovarPrestamo = prestamoRepo.findByUsuarioEmailAndLibroId(usuarioEmail, libroId);
+
+        if(renovarPrestamo == null) {
+            throw new Exception("Prestamo no existe");
+        }
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date fechaRetorno = simpleDateFormat.parse(renovarPrestamo.getFechaRetorno());
+        Date fechaActual = simpleDateFormat.parse(LocalDate.now().toString());
+
+        renovarPrestamo.setEstado("Confirmado");
+
+        if (fechaRetorno.compareTo(fechaActual) >= 0) {
+            renovarPrestamo.setFechaRetorno(LocalDate.now().plusDays(7).toString());
+            prestamoRepo.save(renovarPrestamo);
+        }
     }
 
 }

@@ -157,15 +157,11 @@ public class LibroService {
             throw new Exception("Prestamo no existe");
         }
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        renovarPrestamo.setEstado("Espera Renovacion");
 
-        Date fechaRetorno = simpleDateFormat.parse(renovarPrestamo.getFechaRetorno());
-        Date fechaActual = simpleDateFormat.parse(LocalDate.now().toString());
-
-        if (fechaRetorno.compareTo(fechaActual) >= 0) {
-            renovarPrestamo.setFechaRetorno(LocalDate.now().plusDays(7).toString());
-            prestamoRepo.save(renovarPrestamo);
-        }
+        prestamoRepo.save(renovarPrestamo);
     }
+
+
 
 }

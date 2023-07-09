@@ -96,25 +96,81 @@ public class AdminControlador {
     }
 
     @RequestMapping(value = "/confidencial/listaprestamos/confirmar", method = RequestMethod.GET) //Devuelve todos los prestamos "En Espera"
-    public List<PrestamosRespuesta> listaPrestamosConfirmar(@RequestHeader(value = "Authorization") String token) throws Exception {
+    public List<PrestamosRespuesta> listaPrestamosPorConfirmar(@RequestHeader(value = "Authorization") String token) throws Exception {
 
         String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
         if (admin == null || !admin.equals("admin")) {
             throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
         }
 
-        return adminService.listarPrestamosPorConfirmar();
+        return adminService.listarPrestamosPorEstado("Espera");
     }
 
-    @RequestMapping(value = "/confidencial/listaprestamos/usuario", method = RequestMethod.GET)
-    public List<PrestamosRespuesta> listarPrestamosConfirmarPorUsuario(@RequestHeader(value = "Authorization") String token, @RequestParam String correoUsuario) throws Exception {
+    @RequestMapping(value = "/confidencial/listaprestamos/buscar", method = RequestMethod.GET)
+    public List<PrestamosRespuesta> listarPrestamosPorEstadoPorUsuario(@RequestHeader(value = "Authorization") String token,
+                                                                       @RequestParam String estado ,
+                                                                       @RequestParam String correoUsuario) throws Exception {
 
         String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
         if (admin == null || !admin.equals("admin")) {
             throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
         }
 
-        return adminService.listarPrestamosPorCorreoUsuarioPorConfirmar(correoUsuario);
+        return adminService.listarPrestamosPorCorreoUsuarioPorConfirmar(correoUsuario, estado);
+    }
+
+    @RequestMapping(value = "/confidencial/prestamo/renovacion/listar", method = RequestMethod.GET)
+    public List<PrestamosRespuesta> listarPrestamosPorRenovar(@RequestHeader(value = "Authorization") String token) throws Exception {
+
+        String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
+        if (admin == null || !admin.equals("admin")) {
+            throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
+        }
+
+        return adminService.listarPrestamosPorEstado("Espera Renovacion");
+    }
+
+    @RequestMapping(value = "/confidencial/prestamo/renovacion/confirmar", method = RequestMethod.PUT)
+    public void renovarPrestamoConfirmar(@RequestHeader(value = "Authorization") String token, @RequestParam Long libroId, @RequestParam String usuarioCorreo) throws Exception {
+
+        String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
+        if (admin == null || !admin.equals("admin")) {
+            throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
+        }
+
+        adminService.confirmarRenovacionPrestamo(usuarioCorreo, libroId);
+    }
+
+    @RequestMapping(value = "/confidencial/prestamo/renovacion/cancelar", method = RequestMethod.PUT)
+    public void renovarPrestamoCancelar(@RequestHeader(value = "Authorization") String token, @RequestParam Long libroId, @RequestParam String usuarioCorreo) throws Exception {
+
+        String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
+        if (admin == null || !admin.equals("admin")) {
+            throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
+        }
+
+        adminService.confirmarRenovacionPrestamo(usuarioCorreo, libroId);
+    }
+
+    @RequestMapping(value = "/confidencial/prestamo/retornar/listar", method = RequestMethod.GET)
+    public List<PrestamosRespuesta> listarPrestamosPorRetornar(@RequestHeader(value = "Authorization") String token) throws Exception {
+
+        String admin = JWT.procesandoJWT(token, "\"usuarioRol\"");
+        if (admin == null || !admin.equals("admin")) {
+            throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
+        }
+
+        return adminService.listarPrestamosPorEstado("Retorno Confirmar");
+    }
+
+    @RequestMapping(value = "/confidencial/prestamo/retornar/confirmar", method = RequestMethod.PUT)
+    public void retornarPrestamoConfirmar(@RequestHeader(value = "Authorization") String token) throws Exception {
+
+    }
+
+    @RequestMapping(value = "/confidencial/prestamo/retornar/cancelar", method = RequestMethod.PUT)
+    public void retornarPrestamoCancelar(@RequestHeader(value = "Authorization") String token) throws Exception {
+
     }
 
 }
