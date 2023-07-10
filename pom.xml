@@ -14,7 +14,7 @@
 	<name>spring-boot-proyectotitulo</name>
 	<description>Backend de proyecto de titulo</description>
 	<properties>
-		<java.version>18</java.version>
+		<java.version>1.8</java.version>
 	</properties>
 	<dependencies>
 
