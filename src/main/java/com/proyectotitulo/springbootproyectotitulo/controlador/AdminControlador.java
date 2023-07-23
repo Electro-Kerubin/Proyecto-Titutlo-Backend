@@ -160,7 +160,7 @@ public class AdminControlador {
             throw new Exception("el rol de usuario no tiene permiso para realizar esta peticion");
         }
 
-        return adminService.listarPrestamosPorEstado("Retorno Confirmar");
+        return adminService.listarPrestamosPorEstado("Espera Retorno");
     }
 
     @RequestMapping(value = "/confidencial/prestamo/retornar/confirmar", method = RequestMethod.PUT)
